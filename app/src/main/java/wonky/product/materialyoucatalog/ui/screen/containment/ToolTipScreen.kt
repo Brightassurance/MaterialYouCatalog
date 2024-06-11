@@ -8,19 +8,18 @@ import androidx.compose.material.icons.rounded.AccessTime
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.PlainTooltipBox
-import androidx.compose.material3.RichTooltipBox
-import androidx.compose.material3.RichTooltipState
+import androidx.compose.material3.PlainTooltip
+import androidx.compose.material3.RichTooltip
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import kotlinx.coroutines.launch
 import wonky.product.materialyoucatalog.R
 import wonky.product.materialyoucatalog.ui.screen.MaterialContents
 import wonky.product.materialyoucatalog.ui.screen.MaterialElementScreen
@@ -37,11 +36,16 @@ fun ToolTipScreen() {
             title = "Plain Tooltip",
             componentContent = {
                 Column {
-                    PlainTooltipBox(tooltip = {
-                        Text("Plain tooltip")
-                    }) {
+                    TooltipBox(
+                        positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+                        tooltip = {
+                            PlainTooltip{
+                                Text("Plain tooltip")
+                            }
+                        },
+                        state = rememberTooltipState()
+                    ){
                         IconButton(
-                            modifier = Modifier.tooltipAnchor(),
                             onClick = { /*TODO*/ }
                         ) {
                             Icon(
@@ -63,29 +67,23 @@ fun ToolTipScreen() {
             }
         )
 
-        val richTooltipState = remember { RichTooltipState()}
+        val tooltipState = rememberTooltipState(isPersistent = true)
         val composableScope = rememberCoroutineScope()
 
         MaterialElementScreen(
             title = "Rich Tooltip",
             componentContent = {
                 Column {
-                    RichTooltipBox(
-                        text = { Text(stringResource(R.string.rich_tooltips_message))},
-                        title = { Text("Rich tooltip")},
-                        action = {
-                            TextButton(onClick = {
-                                composableScope.launch {
-                                    richTooltipState.dismiss()
-                                }
-                            }) {
-                                Text("I understood")
+                    TooltipBox(
+                        positionProvider = TooltipDefaults.rememberRichTooltipPositionProvider(),
+                        tooltip = {
+                            RichTooltip{
+                                Text(stringResource(R.string.rich_tooltips_message))
                             }
                         },
-                        tooltipState = richTooltipState
-                    ) {
+                        state = rememberTooltipState()
+                    ){
                         IconButton(
-                            modifier = Modifier.tooltipAnchor(),
                             onClick = { /*TODO*/ }
                         ) {
                             Icon(

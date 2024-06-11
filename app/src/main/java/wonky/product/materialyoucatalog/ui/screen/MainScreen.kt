@@ -2,11 +2,20 @@ package wonky.product.materialyoucatalog.ui.screen
 
 import android.annotation.SuppressLint
 import android.os.Build
-import android.webkit.WebView
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -16,10 +25,36 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.filled.Code
+import androidx.compose.material.icons.filled.ColorLens
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.rememberModalBottomSheetState
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.Divider
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -28,24 +63,41 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.google.accompanist.web.WebView
-import com.google.accompanist.web.rememberWebViewState
 import kotlinx.coroutines.launch
 import wonky.product.materialyoucatalog.CatalogTheme
 import wonky.product.materialyoucatalog.MainViewModel
 import wonky.product.materialyoucatalog.R
 import wonky.product.materialyoucatalog.ad.FullScreenAd
-import wonky.product.materialyoucatalog.core.*
+import wonky.product.materialyoucatalog.core.AnimatedAsStateLink
+import wonky.product.materialyoucatalog.core.AnimatedContentLink
+import wonky.product.materialyoucatalog.core.AnimatedVisibilityLink
+import wonky.product.materialyoucatalog.core.AppBarLink
+import wonky.product.materialyoucatalog.core.BadgeScreenLink
+import wonky.product.materialyoucatalog.core.BoxLink
+import wonky.product.materialyoucatalog.core.ButtonsLink
+import wonky.product.materialyoucatalog.core.CardsLink
+import wonky.product.materialyoucatalog.core.CarouselScreenLink
+import wonky.product.materialyoucatalog.core.ChipsLink
+import wonky.product.materialyoucatalog.core.ColumnAndRowLink
+import wonky.product.materialyoucatalog.core.DatePickerLink
+import wonky.product.materialyoucatalog.core.DialogsLink
+import wonky.product.materialyoucatalog.core.FacebookLoginScreenLink
+import wonky.product.materialyoucatalog.core.GmailScreenLink
+import wonky.product.materialyoucatalog.core.NavigationRailLink
+import wonky.product.materialyoucatalog.core.ProgressIndicatorLink
+import wonky.product.materialyoucatalog.core.SamsungAlarmScreenLink
+import wonky.product.materialyoucatalog.core.SearchBarLink
+import wonky.product.materialyoucatalog.core.SlidersLink
+import wonky.product.materialyoucatalog.core.TabLink
+import wonky.product.materialyoucatalog.core.TextFieldsLink
+import wonky.product.materialyoucatalog.core.TooltipsLink
 import wonky.product.materialyoucatalog.ui.drawer.DrawerMenu
 import wonky.product.materialyoucatalog.ui.drawer.DrawerScreen
 import wonky.product.materialyoucatalog.ui.screen.actions.ButtonScreen
@@ -77,7 +129,7 @@ private const val TAG = "MainScreen"
 
 
 @RequiresApi(Build.VERSION_CODES.O)
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MainScreen(
     mainViewModel: MainViewModel,
@@ -199,6 +251,7 @@ fun MainContent(
     var sourceCodeProvided by remember { mutableStateOf(false) }
     var currentRoute by remember { mutableStateOf("Style/Palette") }
     var showCodeScreen by remember { mutableStateOf(false) }
+    var showCaseScreen by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
     DisposableEffect(navController) {
@@ -298,10 +351,30 @@ fun MainContent(
                 composable(DrawerMenu.AnimatedVisibility.route) { AnimatedVisibilityScreen() }
                 composable(DrawerMenu.AnimatedAsState.route) { AnimateAsStateScreen() }
                 composable(DrawerMenu.AnimatedContent.route) { AnimatedContentScreen() }
-                composable(DrawerMenu.SamsungAlarm.route) { SamsungAlarmScreen() }
-                composable(DrawerMenu.CircularCarousel.route) { CircularCarouselScreen() }
-                composable(DrawerMenu.FacebookLogin.route) { FacebookLoginScreen() }
-                composable(DrawerMenu.GoogleMail.route) { GmailMainScreen() }
+                composable(DrawerMenu.SamsungAlarm.route) {
+                    FullScreenAd.showInterstitial(context = context) {
+                        showCaseScreen = true
+                    }
+                    SamsungAlarmScreen()
+                }
+                composable(DrawerMenu.CircularCarousel.route) {
+                    FullScreenAd.showInterstitial(context = context) {
+                        showCaseScreen = true
+                    }
+                    CircularCarouselScreen()
+                }
+                composable(DrawerMenu.FacebookLogin.route) {
+                    FullScreenAd.showInterstitial(context = context) {
+                        showCaseScreen = true
+                    }
+                    FacebookLoginScreen()
+                }
+                composable(DrawerMenu.GoogleMail.route) {
+                    FullScreenAd.showInterstitial(context = context) {
+                        showCaseScreen = true
+                    }
+                    GmailMainScreen()
+                }
                 //composable(DrawerMenu.UpdateTransition.route) { UpdateTransitionScreen() }
                 composable(DrawerMenu.Tooltips.route) { ToolTipScreen() }
                 composable(DrawerMenu.Badges.route) { BadgeScreen() }

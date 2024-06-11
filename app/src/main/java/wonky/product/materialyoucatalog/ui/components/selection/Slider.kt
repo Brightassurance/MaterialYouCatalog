@@ -38,7 +38,6 @@ fun MYDiscreteSlider(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MYRangeSlider(
     modifier: Modifier = Modifier,

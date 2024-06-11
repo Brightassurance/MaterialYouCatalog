@@ -113,14 +113,14 @@ fun MYMediumTopAppBar(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MYSmallTopAppBar(
+fun MYTopAppBar(
     modifier: Modifier = Modifier
 ){
     Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        SmallTopAppBar(
+        TopAppBar(
             modifier = modifier,
             title = { Text("Title")},
             navigationIcon = {
